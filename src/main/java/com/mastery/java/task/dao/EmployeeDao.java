@@ -3,29 +3,33 @@ package com.mastery.java.task.dao;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import java.sql.*;
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class EmployeeDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private static final String table="employee";
+    //sequence manages autoincrement in the employee_id column
+    private static final String sequence = "my_serial";
 
-    public Employee retrieve(Long id){
+    public Employee retrieve(Long id) throws EmptyResultDataAccessException {
         String query = "Select*From "+table+ " WHERE employee_id='"+id+"';";
-        Employee employee = jdbcTemplate.queryForObject(query,new EmployeeRowMapper());
-        return employee;
+        return jdbcTemplate.queryForObject(query,new EmployeeRowMapper());
     }
     public List<Employee> findByName(String firstName){
         String query = "Select*From "+table+ " WHERE first_name = '"+firstName+"';";
@@ -42,52 +46,57 @@ public class EmployeeDao {
     }
     //Adds a new employee to the db and returns its employeeID generated automatically by the db
     public Long create (Employee employee) throws DuplicateKeyException {
-        String query = sqlInsertMapper(employee);
-        query = "INSERT INTO "+ table+ " ( "+
-            "first_name, last_name, department_id, job_title, gender, date_of_birth"+
-            ") VALUES (" +query+");";
-
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        PreparedStatementCreatorFactory pscf = new PreparedStatementCreatorFactory(query);
-        pscf.setReturnGeneratedKeys(true);
-        jdbcTemplate.update(pscf.newPreparedStatementCreator(new ArrayList<>()), keyHolder);
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement("INSERT INTO "+table+" ( "+
+                    "first_name, last_name, department_id, job_title, gender, date_of_birth"+
+                    ") VALUES ( ?, ?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1,employee.getFirstName());
+            ps.setString(2,employee.getLastName());
+            ps.setInt(3, employee.getDepartmentID());
+            ps.setString(4, employee.getJobTitle());
+            ps.setString(5, genderSQL(employee.getGender()));
+            ps.setDate(6,new Date(employee.getDateOfBirth().getTime().getTime()));
+            return ps;
+        }, keyHolder);
+
         return ((Number) keyHolder.getKeys().get("employee_id")).longValue();
     }
     // updates the record with an employee_id of the employee
     public Integer update (Employee employee){
-        String gender = (employee.getGender()==Gender.MALE)?"m":((employee.getGender()==Gender.FEMALE)?"f":"n/b");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String dateOfBirth = dateFormat.format(employee.getDateOfBirth().getTime());
-        String query = "UPDATE employee " +
-                "SET  first_name = '" + employee.getFirstName()+
-                "', last_name = '" + employee.getLastName()+
-                "', department_id = " + employee.getDepartmentID()+
-                ", job_title = '" + employee.getJobTitle() +
-                "', gender = '" + gender +
-                "', date_of_birth = '" + dateOfBirth +
-                "' WHERE employee_id = " + employee.getEmployeeID()+ ";";
-        return jdbcTemplate.update(query);
+        return jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement("UPDATE " + table+
+                    " SET first_name = ?," +
+                    " last_name = ?," +
+                    " department_id = ?," +
+                    " job_title = ?," +
+                    " gender = ?," +
+                    " date_of_birth = ?" +
+                    " WHERE employee_id = ?;");
+            ps.setString(1,employee.getFirstName());
+            ps.setString(2,employee.getLastName());
+            ps.setInt(3, employee.getDepartmentID());
+            ps.setString(4, employee.getJobTitle());
+            ps.setString(5, genderSQL(employee.getGender()));
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            ps.setDate(6,new Date(employee.getDateOfBirth().getTime().getTime()));
+            ps.setLong(7, employee.getEmployeeID());
+            return ps;
+        });
     }
     //removes a record by employee id.
     public Integer delete(Long employeeID){
         String query = "DELETE FROM " + table + " WHERE employee_id='"+employeeID+"';";
         Integer numberOfRowsDeleted = jdbcTemplate.update(query);
-        jdbcTemplate.execute("ALTER SEQUENCE my_serial RESTART WITH "+employeeID+";");
+        //sequence manages autoincrement in the employee_id column
+        //after successfully removing a record, put the sequence cursor on the deleted id
+        jdbcTemplate.execute("ALTER SEQUENCE "+ sequence+" RESTART WITH "+employeeID+";");
         return numberOfRowsDeleted;
     }
-    // map the VALUES from Employee for INSERT statements
-    private String sqlInsertMapper (Employee employee){
-        //Adding VALUES to sql query one by one separated by ","
-        String query = "'"+employee.getFirstName()+"'";
-        query += ","+"'"+employee.getLastName()+"'";
-        query += ","+ employee.getDepartmentID();
-        query += "," + "'"+employee.getJobTitle()+"'";
-        if (employee.getGender()== Gender.MALE) query += "," + "'m'";
-        else if (employee.getGender()== Gender.FEMALE) query += "," + "'f'";
-        else query += "," + "'n/b'";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        query += "," + "'"+dateFormat.format(employee.getDateOfBirth().getTime())+"'";
-        return query;
+    private String genderSQL(Gender gender){
+        if (gender== Gender.MALE) return "m";
+        else if (gender== Gender.FEMALE) return "f";
+        else return "n/b";
     }
     //mapping for the "employee" table to retrieve Employee objects
     class EmployeeRowMapper implements RowMapper<Employee>{
@@ -104,7 +113,6 @@ public class EmployeeDao {
             else gender = Gender.OTHER;
             SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd");
             Calendar dateOfBirth = Calendar.getInstance();
-            String genderString = rs.getString("gender");
             try {
                 dateOfBirth.setTime(simpleDate.parse(rs.getString("date_of_birth")));
             } catch (ParseException e) {
