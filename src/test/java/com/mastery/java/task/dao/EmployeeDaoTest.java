@@ -33,12 +33,12 @@ public class EmployeeDaoTest {
         employee.setEmployeeID(employeeDao.create(employee));
         System.out.println("New employee_id = "+employee.getEmployeeID());
     }
-    /*removes all records with the surname "Surname" starting with the largest id (to set the auto
+    /*removes all records with the name "Test" starting with the largest id (to set the auto
     generated id sequence on the lowest id gap*/
     @Test
     public void testDeleteRecord(){
         List<Employee> employeeList = employeeDao.retrieveAll();
-        employeeList.stream().filter(emp->emp.getLastName().equals("Surname"))
+        employeeList.stream().filter(emp->emp.getFirstName().equals("Test"))
                 .sorted(Comparator.comparingLong(Employee::getEmployeeID).reversed())
                 .forEach(employee -> employeeDao.delete(employee.getEmployeeID()));
 

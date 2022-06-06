@@ -18,8 +18,9 @@ public class EmployeeController {
     public ResponseEntity<List<Employee>> getEmployee(@RequestParam(value = "id", defaultValue = "-1")Long employeeID){
         List<Employee> employeeList = new ArrayList<>();
         if (employeeID.equals(-1L)) employeeList = employeeService.getAllEmployees();
-        else  employeeList.add(employeeService.getEmployeeByID(employeeID));
-        return new ResponseEntity<>(employeeList, HttpStatus.OK);
+        else employeeService.getEmployeeByID(employeeID).ifPresent(employeeList::add);
+        HttpStatus status = employeeList.isEmpty()?HttpStatus.NOT_FOUND:HttpStatus.OK;
+        return new ResponseEntity<>(employeeList, status);
     }
     @PutMapping(path = "/employee",
             consumes = MediaType.APPLICATION_JSON_VALUE,
