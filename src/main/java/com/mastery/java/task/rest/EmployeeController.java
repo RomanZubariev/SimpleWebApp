@@ -1,47 +1,45 @@
 package com.mastery.java.task.rest;
 
 import com.mastery.java.task.dto.Employee;
-import com.mastery.java.task.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
+import com.mastery.java.task.service.Service;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class EmployeeController {
-    @Autowired
-    EmployeeService employeeService;
-    @GetMapping("/employee")
-    public ResponseEntity<List<Employee>> getEmployee(@RequestParam(value = "id", defaultValue = "-1")Long employeeID){
-        List<Employee> employeeList = new ArrayList<>();
-        if (employeeID.equals(-1L)) employeeList = employeeService.getAllEmployees();
-        else employeeService.getEmployeeByID(employeeID).ifPresent(employeeList::add);
-        HttpStatus status = employeeList.isEmpty()?HttpStatus.NOT_FOUND:HttpStatus.OK;
-        return new ResponseEntity<>(employeeList, status);
-    }
-    @PutMapping(path = "/employee",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Long> create(@RequestBody Employee employee) {
-        Long newID = employeeService.createEmployeeRecord(employee);
-        return new ResponseEntity<>(newID, HttpStatus.CREATED);
-    }
-    @PostMapping(path = "/employee",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateRecord(@RequestBody Employee employee) {
-        if (employeeService.updateEmployeeRecord(employee)==1)
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        else return new ResponseEntity(HttpStatus.NOT_FOUND);
-    }
-    @DeleteMapping("/employee")
-    public ResponseEntity deleteRecord(@RequestParam (value = "id", defaultValue = "-1") Long employeeID){
-        if (employeeID==-1L) return new ResponseEntity(HttpStatus.NOT_FOUND);
-        if (employeeService.deleteEmployeeRecord(employeeID)==1) return new ResponseEntity(HttpStatus.NO_CONTENT);
-        else  return new ResponseEntity(HttpStatus.NOT_FOUND);
-    }
+@RequestMapping("/employee")
+public class EmployeeController implements Controller<Employee> {
+
+  @Autowired
+  Service<Employee> employeeService;
+
+  @Override
+  public Employee get(Long id) {
+    Optional<Employee> optEmployee = employeeService.getById(id);
+    return optEmployee.get();
+  }
+
+  @Override
+  public List<Employee> getAll() {
+    return employeeService.getAll();
+  }
+
+  @Override
+  public void save(Employee employee) {
+    employeeService.save(employee);
+  }
+
+  @Override
+  public void update(Employee employee, Long id) {
+    employee.setEmployeeId(id);
+    employeeService.update(employee);
+  }
+
+  @Override
+  public void delete(Long id) {
+    employeeService.deleteById(id);
+  }
 
 }
