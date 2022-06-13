@@ -9,12 +9,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class EmployeeDao implements Dao<Employee> {
@@ -23,9 +24,14 @@ public class EmployeeDao implements Dao<Employee> {
   @Autowired
   private JdbcTemplate jdbcTemplate;
 
-  public Optional<Employee> getById(Long id) throws EmptyResultDataAccessException {
+  public Employee getById(Long id) {
     String query = "Select*From " + TABLE + " WHERE employee_id = ?;";
-    return Optional.of(jdbcTemplate.queryForObject(query, new EmployeeRowMapper(), id));
+    try {
+      return jdbcTemplate.queryForObject(query, new EmployeeRowMapper(), id);
+    } catch (EmptyResultDataAccessException e) {
+      e.printStackTrace();
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
+    }
   }
 
   //retrieve the whole table as a List of Employee
@@ -45,7 +51,7 @@ public class EmployeeDao implements Dao<Employee> {
       ps.setString(2, employee.getLastName());
       ps.setInt(3, employee.getDepartmentId());
       ps.setString(4, employee.getJobTitle());
-      ps.setString(5, genderSQL(employee.getGender()));
+      ps.setString(5, employee.getGender().toString());
       ps.setDate(6, Date.valueOf(employee.getDateOfBirth()));
       return ps;
     });
@@ -54,7 +60,7 @@ public class EmployeeDao implements Dao<Employee> {
   // updates the record with an employee_id of the employee
   @Override
   public void update(Employee employee) {
-    jdbcTemplate.update(con -> {
+    int numOfRowsUpdated = jdbcTemplate.update(con -> {
       PreparedStatement ps = con.prepareStatement(
           "UPDATE " + TABLE + " SET first_name = ?," + " last_name = ?," + " department_id = ?,"
               + " job_title = ?," + " gender = ?," + " date_of_birth = ?"
@@ -63,27 +69,23 @@ public class EmployeeDao implements Dao<Employee> {
       ps.setString(2, employee.getLastName());
       ps.setInt(3, employee.getDepartmentId());
       ps.setString(4, employee.getJobTitle());
-      ps.setString(5, genderSQL(employee.getGender()));
+      ps.setString(5, employee.getGender().toString());
       ps.setDate(6, Date.valueOf(employee.getDateOfBirth()));
       ps.setLong(7, employee.getEmployeeId());
       return ps;
     });
+    if (numOfRowsUpdated == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
+    }
   }
 
   //removes a record by employee id.
   @Override
   public void deleteById(Long employeeId) {
     String query = "DELETE FROM " + TABLE + " WHERE employee_id = ?;";
-    jdbcTemplate.update(query, employeeId);
-  }
-
-  private String genderSQL(Gender gender) {
-    if (gender == Gender.MALE) {
-      return "m";
-    } else if (gender == Gender.FEMALE) {
-      return "f";
-    } else {
-      return "n/b";
+    int numOfRowsDeleted = jdbcTemplate.update(query, employeeId);
+    if (numOfRowsDeleted == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
     }
   }
 
@@ -97,16 +99,8 @@ public class EmployeeDao implements Dao<Employee> {
       String lastName = rs.getString("last_name");
       Integer departmentID = rs.getInt("department_id");
       String jobTitle = rs.getString("job_title");
-      Gender gender;
-      if (rs.getString("gender").equals("m")) {
-        gender = Gender.MALE;
-      } else if (rs.getString("gender").equals("f")) {
-        gender = Gender.FEMALE;
-      } else {
-        gender = Gender.OTHER;
-      }
+      Gender gender = Gender.valueOf(rs.getString("gender"));
       LocalDate dateOfBirth = rs.getDate("date_of_birth").toLocalDate();
-
       return new Employee(employeeID, firstName, lastName, departmentID, jobTitle, gender,
           dateOfBirth);
     }
