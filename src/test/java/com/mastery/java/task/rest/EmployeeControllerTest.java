@@ -5,13 +5,14 @@ import com.mastery.java.task.dto.Gender;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.server.ResponseStatusException;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class EmployeeControllerTest {
 
@@ -29,13 +30,14 @@ public class EmployeeControllerTest {
     Employee employee = new Employee(1L, firstName, lastName, departmentID, jobTitle, gender, date);
     employeeController.save(employee);
     List<Employee> list = employeeController.getAll();
-    employee.setEmployeeId(list.get(list.size()-1).getEmployeeId());
-    System.out.println(employee.getEmployeeId()+" "+employee.getFirstName()+" "+employee.getLastName());
+    employee.setEmployeeId(list.get(list.size() - 1).getEmployeeId());
+    System.out.println(
+        employee.getEmployeeId() + " " + employee.getFirstName() + " " + employee.getLastName());
   }
 
   @Test
   public void put() {
-    Long employeeId = 21L;
+    Long employeeId = 36l;
     String firstName = "Test";
     String lastName = "Surname";
     Integer departmentID = 2;
@@ -44,22 +46,24 @@ public class EmployeeControllerTest {
     LocalDate date = LocalDate.now();
     Employee employee = new Employee(employeeId, firstName, lastName, departmentID, jobTitle,
         gender, date);
-    employeeController.update(employee, employeeId);
+    try {
+      employeeController.update(employee, employeeId);
+    } catch (ResponseStatusException e) {
+      e.printStackTrace();
+      System.err.println("Employee not found");
+    }
   }
 
   @Test
-  public void get() {
+  public void rewrite() {
     employeeController.getAll()
-        .forEach(employee -> System.out.println(
-            employeeController.get(employee.getEmployeeId()).getLastName()));
-
+        .forEach(employee -> employeeController.update(employee, employee.getEmployeeId()));
   }
 
   /*removes all records with the name "Test" starting with the largest id*/
   @Test
   public void delete() {
-    employeeController.getAll().stream()
-        .filter(emp -> emp.getFirstName().equals("Test"))
+    employeeController.getAll().stream().filter(emp -> emp.getFirstName().equals("Test"))
         .sorted(Comparator.comparingLong(Employee::getEmployeeId).reversed())
         .forEach(employee -> employeeController.delete(employee.getEmployeeId()));
   }

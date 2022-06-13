@@ -22,11 +22,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <artifactId>junit</artifactId>
-      <groupId>junit</groupId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <artifactId>spring-context</artifactId>
       <groupId>org.springframework</groupId>
     </dependency>

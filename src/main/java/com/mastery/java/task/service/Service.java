@@ -1,11 +1,10 @@
 package com.mastery.java.task.service;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface Service<T> {
 
-  Optional<T> getById(Long id);
+  T getById(Long id);
 
   List<T> getAll();
 

@@ -3,7 +3,6 @@ package com.mastery.java.task.rest;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.service.Service;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,8 +16,7 @@ public class EmployeeController implements Controller<Employee> {
 
   @Override
   public Employee get(Long id) {
-    Optional<Employee> optEmployee = employeeService.getById(id);
-    return optEmployee.get();
+    return employeeService.getById(id);
   }
 
   @Override
