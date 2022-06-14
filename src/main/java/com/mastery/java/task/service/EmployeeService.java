@@ -4,9 +4,9 @@ import com.mastery.java.task.dao.Dao;
 import com.mastery.java.task.dto.Employee;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
+
+@org.springframework.stereotype.Service
 public class EmployeeService implements Service<Employee> {
 
   @Autowired
@@ -24,18 +24,18 @@ public class EmployeeService implements Service<Employee> {
 
   //Adds a record with id generated automatically
   @Override
-  public void save(Employee employee) {
-    employeeDao.save(employee);
+  public Employee save(Employee employee) {
+    return employeeDao.save(employee);
   }
 
   @Override
-  public void update(Employee employee) {
-    employeeDao.update(employee);
+  public Employee update(Employee employee) {
+    return employeeDao.update(employee);
   }
 
   @Override
-  public void deleteById(Long id) {
-    employeeDao.deleteById(id);
+  public Employee deleteById(Long id) {
+    return employeeDao.deleteById(id);
   }
 
 }

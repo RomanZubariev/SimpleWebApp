@@ -1,18 +1,18 @@
 package com.mastery.java.task.dao;
 
 import java.util.List;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 public interface Dao<T> {
 
   T getById(Long id);
 
   List<T> getAll();
 
-  void save(T t);
+  T save(T t);
 
-  void update(T t);
+  T update(T t);
 
-  void deleteById(Long id);
+  T deleteById(Long id);
 }

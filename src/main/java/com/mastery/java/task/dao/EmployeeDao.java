@@ -1,108 +1,86 @@
 package com.mastery.java.task.dao;
 
 import com.mastery.java.task.dto.Employee;
-import com.mastery.java.task.dto.Gender;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
-@Component
+@Repository
 public class EmployeeDao implements Dao<Employee> {
 
-  private static final String TABLE = "employee";
+  private static final String GET_BY_ID_SQL = "Select*From employee WHERE employee_id = ?;";
+  private static final String GET_ALL_SQL = "SELECT*FROM employee;";
+  private static final String DELETE_BY_ID_SQL = "DELETE FROM employee WHERE employee_id = ?;";
+  private static final String UPDATE_SQL = "UPDATE employee SET first_name = ?, last_name = ?,"
+      + " department_id = ?, job_title = ?, gender = ?, date_of_birth = ? WHERE employee_id = ?;";
+
   @Autowired
   private JdbcTemplate jdbcTemplate;
+  private SimpleJdbcInsert simpleJdbcInsert;
+
+  @Autowired
+  public void setSimpleJdbcInsert(SimpleJdbcInsert simpleJdbcInsert) {
+    this.simpleJdbcInsert = simpleJdbcInsert.withTableName("employee")
+        .usingGeneratedKeyColumns("employee_id");
+  }
 
   public Employee getById(Long id) {
-    String query = "Select*From " + TABLE + " WHERE employee_id = ?;";
     try {
-      return jdbcTemplate.queryForObject(query, new EmployeeRowMapper(), id);
+      return jdbcTemplate.queryForObject(GET_BY_ID_SQL, new BeanPropertyRowMapper<>(Employee.class),
+          id);
     } catch (EmptyResultDataAccessException e) {
       e.printStackTrace();
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
     }
   }
 
-  //retrieve the whole table as a List of Employee
+  //read the whole table as a List of Employee
   public List<Employee> getAll() {
-    String query = "SELECT*FROM " + TABLE + ";";
-    return jdbcTemplate.query(query, new EmployeeRowMapper());
+    return jdbcTemplate.query(GET_ALL_SQL, new BeanPropertyRowMapper<>(Employee.class));
   }
 
   //Adds a new employee to the db and returns its employeeID generated automatically by the db
   @Override
-  public void save(Employee employee) {
-    jdbcTemplate.update(con -> {
-      PreparedStatement ps = con.prepareStatement("INSERT INTO " + TABLE + " ( "
-          + "first_name, last_name, department_id, job_title, gender, date_of_birth"
-          + ") VALUES ( ?, ?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
-      ps.setString(1, employee.getFirstName());
-      ps.setString(2, employee.getLastName());
-      ps.setInt(3, employee.getDepartmentId());
-      ps.setString(4, employee.getJobTitle());
-      ps.setString(5, employee.getGender().toString());
-      ps.setDate(6, Date.valueOf(employee.getDateOfBirth()));
-      return ps;
-    });
+  public Employee save(Employee employee) {
+    Map<String, Object> parameters = new HashMap<>(6);
+    parameters.put("first_name", employee.getFirstName());
+    parameters.put("last_name", employee.getLastName());
+    parameters.put("department_id", employee.getDepartmentId());
+    parameters.put("job_title", employee.getJobTitle());
+    parameters.put("gender", employee.getGender().toString());
+    parameters.put("date_of_birth", Date.valueOf(employee.getDateOfBirth()));
+    employee.setEmployeeId((Long) simpleJdbcInsert.executeAndReturnKey(parameters));
+    return employee;
   }
 
   // updates the record with an employee_id of the employee
   @Override
-  public void update(Employee employee) {
-    int numOfRowsUpdated = jdbcTemplate.update(con -> {
-      PreparedStatement ps = con.prepareStatement(
-          "UPDATE " + TABLE + " SET first_name = ?," + " last_name = ?," + " department_id = ?,"
-              + " job_title = ?," + " gender = ?," + " date_of_birth = ?"
-              + " WHERE employee_id = ?;");
-      ps.setString(1, employee.getFirstName());
-      ps.setString(2, employee.getLastName());
-      ps.setInt(3, employee.getDepartmentId());
-      ps.setString(4, employee.getJobTitle());
-      ps.setString(5, employee.getGender().toString());
-      ps.setDate(6, Date.valueOf(employee.getDateOfBirth()));
-      ps.setLong(7, employee.getEmployeeId());
-      return ps;
-    });
+  public Employee update(Employee employee) {
+    int numOfRowsUpdated= jdbcTemplate.update(UPDATE_SQL,
+        employee.getFirstName(), employee.getLastName(), employee.getDepartmentId(),
+        employee.getJobTitle(), employee.getGender().toString(),
+        Date.valueOf(employee.getDateOfBirth()), employee.getEmployeeId());
     if (numOfRowsUpdated == 0) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
     }
+    return employee;
   }
 
   //removes a record by employee id.
   @Override
-  public void deleteById(Long employeeId) {
-    String query = "DELETE FROM " + TABLE + " WHERE employee_id = ?;";
-    int numOfRowsDeleted = jdbcTemplate.update(query, employeeId);
-    if (numOfRowsDeleted == 0) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
-    }
-  }
-
-  //mapping for the "employee" table to retrieve Employee objects
-  class EmployeeRowMapper implements RowMapper<Employee> {
-
-    @Override
-    public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Long employeeID = rs.getLong("employee_id");
-      String firstName = rs.getString("first_name");
-      String lastName = rs.getString("last_name");
-      Integer departmentID = rs.getInt("department_id");
-      String jobTitle = rs.getString("job_title");
-      Gender gender = Gender.valueOf(rs.getString("gender"));
-      LocalDate dateOfBirth = rs.getDate("date_of_birth").toLocalDate();
-      return new Employee(employeeID, firstName, lastName, departmentID, jobTitle, gender,
-          dateOfBirth);
-    }
+  public Employee deleteById(Long employeeId) {
+    //ResponseStatusException will be thrown in getById() if there is no employee with such id
+    Employee employee = getById(employeeId);
+    jdbcTemplate.update(DELETE_BY_ID_SQL, employeeId);
+    return employee;
   }
 }

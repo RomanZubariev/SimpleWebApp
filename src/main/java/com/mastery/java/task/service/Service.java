@@ -2,16 +2,17 @@ package com.mastery.java.task.service;
 
 import java.util.List;
 
+@org.springframework.stereotype.Service
 public interface Service<T> {
 
   T getById(Long id);
 
   List<T> getAll();
 
-  void save(T t);
+  T save(T t);
 
-  void update(T t);
+  T update(T t);
 
-  void deleteById(Long id);
+  T deleteById(Long id);
 
 }
