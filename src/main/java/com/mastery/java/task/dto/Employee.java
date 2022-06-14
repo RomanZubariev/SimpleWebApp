@@ -23,6 +23,10 @@ public class Employee {
     this.dateOfBirth = dateOfBirth;
   }
 
+  //required for mapping with BeanPropertyRowMapper
+  private Employee() {
+  }
+
   public Long getEmployeeId() {
     return this.employeeId;
   }
