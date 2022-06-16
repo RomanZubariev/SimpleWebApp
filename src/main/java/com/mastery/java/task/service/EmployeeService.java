@@ -9,8 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 @org.springframework.stereotype.Service
 public class EmployeeService implements Service<Employee> {
 
-  @Autowired
   private Dao<Employee> employeeDao;
+
+  @Autowired
+  public EmployeeService(Dao<Employee> employeeDao) {
+    this.employeeDao = employeeDao;
+  }
 
   @Override
   public Employee getById(Long id) {
