@@ -23,9 +23,13 @@ public class EmployeeDao implements Dao<Employee> {
   private static final String UPDATE_SQL = "UPDATE employee SET first_name = ?, last_name = ?,"
       + " department_id = ?, job_title = ?, gender = ?, date_of_birth = ? WHERE employee_id = ?;";
 
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
+  private final JdbcTemplate jdbcTemplate;
   private SimpleJdbcInsert simpleJdbcInsert;
+
+  @Autowired
+  public EmployeeDao(JdbcTemplate jdbcTemplate) {
+    this.jdbcTemplate = jdbcTemplate;
+  }
 
   @Autowired
   public void setSimpleJdbcInsert(SimpleJdbcInsert simpleJdbcInsert) {
@@ -65,10 +69,10 @@ public class EmployeeDao implements Dao<Employee> {
   // updates the record with an employee_id of the employee
   @Override
   public Employee update(Employee employee) {
-    int numOfRowsUpdated= jdbcTemplate.update(UPDATE_SQL,
-        employee.getFirstName(), employee.getLastName(), employee.getDepartmentId(),
-        employee.getJobTitle(), employee.getGender().toString(),
-        Date.valueOf(employee.getDateOfBirth()), employee.getEmployeeId());
+    int numOfRowsUpdated = jdbcTemplate.update(UPDATE_SQL, employee.getFirstName(),
+        employee.getLastName(), employee.getDepartmentId(), employee.getJobTitle(),
+        employee.getGender().toString(), Date.valueOf(employee.getDateOfBirth()),
+        employee.getEmployeeId());
     if (numOfRowsUpdated == 0) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
     }

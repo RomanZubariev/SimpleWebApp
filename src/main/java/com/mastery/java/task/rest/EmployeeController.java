@@ -17,8 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/employee")
 public class EmployeeController {
 
-  @Autowired
   Service<Employee> employeeService;
+
+  @Autowired
+  public EmployeeController(Service<Employee> employeeService) {
+    this.employeeService = employeeService;
+  }
 
   @GetMapping("/{id}")
   public Employee get(@PathVariable Long id) {
