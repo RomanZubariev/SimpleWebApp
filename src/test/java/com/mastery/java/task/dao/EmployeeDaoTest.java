@@ -16,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class EmployeeDaoTest {
 
   @Autowired
-  EmployeeDao employeeDao;
+  EmployeeDaoImpl employeeDaoImpl;
 
   //Adds Test Surname employee record and prints it id in the table
   @Test
@@ -29,16 +29,16 @@ public class EmployeeDaoTest {
     LocalDate date = LocalDate.now();
     Employee employee = new Employee(20L, firstName, lastName, departmentID, jobTitle, gender,
         date);
-    employeeDao.save(employee);
+    employeeDaoImpl.save(employee);
   }
 
   /*removes all records with the name "Test" starting with the largest id*/
   @Test
   public void testDeleteRecord() {
-    List<Employee> employeeList = employeeDao.getAll();
+    List<Employee> employeeList = employeeDaoImpl.getAll();
     employeeList.stream().filter(emp -> emp.getFirstName().equals("Test"))
         .sorted(Comparator.comparingLong(Employee::getEmployeeId).reversed())
-        .forEach(employee -> employeeDao.deleteById(employee.getEmployeeId()));
+        .forEach(employee -> employeeDaoImpl.deleteById(employee.getEmployeeId()));
 
   }
 }

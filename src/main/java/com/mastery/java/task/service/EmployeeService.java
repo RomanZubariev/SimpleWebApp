@@ -1,45 +1,18 @@
 package com.mastery.java.task.service;
 
-import com.mastery.java.task.dao.Dao;
 import com.mastery.java.task.dto.Employee;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 
+public interface EmployeeService {
 
-@org.springframework.stereotype.Service
-public class EmployeeService implements Service<Employee> {
+  Employee getById(Long id);
 
-  private Dao<Employee> employeeDao;
+  List<Employee> getAll();
 
-  @Autowired
-  public EmployeeService(Dao<Employee> employeeDao) {
-    this.employeeDao = employeeDao;
-  }
+  Employee save(Employee t);
 
-  @Override
-  public Employee getById(Long id) {
-    return employeeDao.getById(id);
-  }
+  Employee update(Employee t);
 
-  @Override
-  public List<Employee> getAll() {
-    return employeeDao.getAll();
-  }
-
-  //Adds a record with id generated automatically
-  @Override
-  public Employee save(Employee employee) {
-    return employeeDao.save(employee);
-  }
-
-  @Override
-  public Employee update(Employee employee) {
-    return employeeDao.update(employee);
-  }
-
-  @Override
-  public Employee deleteById(Long id) {
-    return employeeDao.deleteById(id);
-  }
+  void deleteById(Long id);
 
 }

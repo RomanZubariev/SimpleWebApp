@@ -7,12 +7,12 @@ import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class EmployeeControllerTest {
 
@@ -47,7 +47,7 @@ public class EmployeeControllerTest {
     Employee employee = new Employee(employeeId, firstName, lastName, departmentID, jobTitle,
         gender, date);
     try {
-      employeeController.update(employee, employeeId);
+      employeeController.update(employee);
     } catch (ResponseStatusException e) {
       e.printStackTrace();
       System.err.println("Employee not found");
@@ -56,8 +56,7 @@ public class EmployeeControllerTest {
 
   @Test
   public void rewrite() {
-    employeeController.getAll()
-        .forEach(employee -> employeeController.update(employee, employee.getEmployeeId()));
+    employeeController.getAll().forEach(employee -> employeeController.update(employee));
   }
 
   /*removes all records with the name "Test" starting with the largest id*/
