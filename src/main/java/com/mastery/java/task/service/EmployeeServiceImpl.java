@@ -1,0 +1,58 @@
+package com.mastery.java.task.service;
+
+import com.mastery.java.task.dao.EmployeeDao;
+import com.mastery.java.task.dao.EmployeeDaoImpl;
+import com.mastery.java.task.dto.Employee;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+@Service
+public class EmployeeServiceImpl implements EmployeeService {
+
+  private final EmployeeDao employeeDao;
+
+  @Autowired
+  public EmployeeServiceImpl(EmployeeDao employeeDao){
+    this.employeeDao = employeeDao;
+  }
+  @Override
+  public Employee getById(Long id) {
+    try {
+      return employeeDao.getById(id);
+    } catch (EmptyResultDataAccessException e) {
+      e.printStackTrace();
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
+    }
+  }
+
+  @Override
+  public List<Employee> getAll() {
+    return employeeDao.getAll();
+  }
+
+  //Adds a record with id generated automatically
+  @Override
+  public Employee save(Employee employee) {
+    return employeeDao.save(employee);
+  }
+
+  @Override
+  public Employee update(Employee employee) {
+    try {
+      return employeeDao.update(employee);
+    } catch (EmptyResultDataAccessException e) {
+      e.printStackTrace();
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
+    }
+  }
+
+  @Override
+  public void deleteById(Long id) {
+    employeeDao.deleteById(id);
+  }
+
+}
