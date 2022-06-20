@@ -1,15 +1,28 @@
 package com.mastery.java.task.dto;
 
 import java.time.LocalDate;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
+@Entity
 public class Employee {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long employeeId;
+
   private String firstName;
   private String lastName;
   private Integer departmentId;
   private String jobTitle;
+
+  @Enumerated(EnumType.STRING)
   private Gender gender;
+
   private LocalDate dateOfBirth;
 
   public Employee(Long employeeId, String firstName, String lastName, Integer departmentId,
@@ -23,8 +36,7 @@ public class Employee {
     this.dateOfBirth = dateOfBirth;
   }
 
-  //required for mapping with BeanPropertyRowMapper
-  private Employee() {
+  public Employee() {
   }
 
   public Long getEmployeeId() {

@@ -1,9 +1,9 @@
 package com.mastery.java.task.service;
 
 import com.mastery.java.task.dao.EmployeeDao;
-import com.mastery.java.task.dao.EmployeeDaoImpl;
 import com.mastery.java.task.dto.Employee;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -16,15 +16,15 @@ public class EmployeeServiceImpl implements EmployeeService {
   private final EmployeeDao employeeDao;
 
   @Autowired
-  public EmployeeServiceImpl(EmployeeDao employeeDao){
+  public EmployeeServiceImpl(EmployeeDao employeeDao) {
     this.employeeDao = employeeDao;
   }
+
   @Override
   public Employee getById(Long id) {
-    try {
+    try{
       return employeeDao.getById(id);
-    } catch (EmptyResultDataAccessException e) {
-      e.printStackTrace();
+    } catch (NoSuchElementException e){
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
     }
   }
@@ -42,17 +42,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public Employee update(Employee employee) {
-    try {
-      return employeeDao.update(employee);
-    } catch (EmptyResultDataAccessException e) {
-      e.printStackTrace();
+    if (employeeDao.update(employee) != null) {
+      return employee;
+    } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
     }
   }
 
   @Override
   public void deleteById(Long id) {
-    employeeDao.deleteById(id);
+    try {
+      employeeDao.deleteById(id);
+    } catch (EmptyResultDataAccessException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
+    }
+
   }
 
 }
