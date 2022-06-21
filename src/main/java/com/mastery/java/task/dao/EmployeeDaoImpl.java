@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class EmployeeDaoImpl implements EmployeeDao {
 
-  private EmployeeRepository employeeRepository;
+  private final EmployeeRepository employeeRepository;
 
   @Autowired
   public EmployeeDaoImpl(EmployeeRepository employeeRepository) {
@@ -17,23 +17,20 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
   @Override
   public Employee getById(Long id) {
-    return employeeRepository.findById(id).get();
+    return employeeRepository.findById(id).orElseThrow();
   }
 
-  //read the whole table as a List of Employee
   @Override
   public List<Employee> getAll() {
     return employeeRepository.findAll();
   }
 
-  //Adds a new employee to the db and returns its employeeID generated automatically by the db
   @Override
   public Employee save(Employee employee) {
     employee.setEmployeeId(null);
     return employeeRepository.save(employee);
   }
 
-  // updates the record with an employee_id of the employee
   @Override
   public Employee update(Employee employee) {
     if (employeeRepository.findById(employee.getEmployeeId()).isPresent()) {
@@ -43,7 +40,6 @@ public class EmployeeDaoImpl implements EmployeeDao {
     }
   }
 
-  //removes a record by employee id.
   @Override
   public void deleteById(Long employeeId) {
     employeeRepository.deleteById(employeeId);
