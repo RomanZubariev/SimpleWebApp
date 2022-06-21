@@ -3,7 +3,6 @@ package com.mastery.java.task.service;
 import com.mastery.java.task.dao.EmployeeDao;
 import com.mastery.java.task.dto.Employee;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -22,11 +21,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public Employee getById(Long id) {
-    try{
-      return employeeDao.getById(id);
-    } catch (NoSuchElementException e){
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
-    }
+    return employeeDao.getById(id);
   }
 
   @Override
