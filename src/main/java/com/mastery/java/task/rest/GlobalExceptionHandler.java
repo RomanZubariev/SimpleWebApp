@@ -25,7 +25,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(ResponseStatusException.class)
   public final ResponseEntity handleResponseStatusException(ResponseStatusException e) {
-    return new ResponseEntity(HttpStatus.NOT_FOUND);
+    return new ResponseEntity(e.getStatus());
   }
 
 }
