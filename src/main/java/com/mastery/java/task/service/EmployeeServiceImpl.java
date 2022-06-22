@@ -1,50 +1,55 @@
 package com.mastery.java.task.service;
 
-import com.mastery.java.task.dao.EmployeeDao;
 import com.mastery.java.task.dto.Employee;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-  private final EmployeeDao employeeDao;
+  private final CrudRepository<Employee, Long> employeeRepository;
+  private EmptyResultDataAccessException notFoundException;
 
   @Autowired
-  public EmployeeServiceImpl(EmployeeDao employeeDao) {
-    this.employeeDao = employeeDao;
+  public EmployeeServiceImpl(CrudRepository<Employee, Long> employeeRepository) {
+    this.employeeRepository = employeeRepository;
+    notFoundException = new EmptyResultDataAccessException("Employee not found", 1);
   }
 
   @Override
   public Employee getById(Long id) {
-    return employeeDao.getById(id);
+    return employeeRepository.findById(id).orElseThrow(() -> notFoundException);
   }
 
   @Override
   public List<Employee> getAll() {
-    return employeeDao.getAll();
+    List<Employee> employeeList = new ArrayList<>();
+    employeeRepository.findAll().forEach(employeeList::add);
+    return employeeList;
   }
 
   @Override
   public Employee save(Employee employee) {
-    return employeeDao.save(employee);
+    employee.setEmployeeId(null);
+    return employeeRepository.save(employee);
   }
 
   @Override
   public Employee update(Employee employee) {
-    if (employeeDao.update(employee) != null) {
-      return employee;
+    if (employeeRepository.existsById(employee.getEmployeeId())) {
+      return employeeRepository.save(employee);
     } else {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
+      throw notFoundException;
     }
   }
 
   @Override
   public void deleteById(Long id) {
-    employeeDao.deleteById(id);
+    employeeRepository.deleteById(id);
   }
 
 }
