@@ -3,6 +3,7 @@ package com.mastery.java.task.service;
 import com.mastery.java.task.dto.Employee;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.repository.CrudRepository;
@@ -34,21 +35,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public Employee save(Employee employee) {
-    if (employee.getEmployeeId() == null) {
-      return employeeRepository.save(employee);
-    } else {
-      throw new IllegalArgumentException("Employee id should be null.");
-    }
+    Optional.ofNullable(employee.getEmployeeId())
+        .ifPresent((id)->{throw new IllegalArgumentException("Employee id should be null.");});
+    return employeeRepository.save(employee);
   }
 
   @Override
   public Employee update(Employee employee) {
-    if (employeeRepository.existsById(employee.getEmployeeId())) {
-      return employeeRepository.save(employee);
-    } else {
-      throw new EmptyResultDataAccessException(
-          "Cannot update employee: id " + employee.getEmployeeId() + " not found", 1);
-    }
+    employeeRepository.findById(employee.getEmployeeId())
+        .orElseThrow(()->new EmptyResultDataAccessException("Cannot update employee: id " + employee.getEmployeeId() + " not found", 1));
+    return employeeRepository.save(employee);
   }
 
   @Override
