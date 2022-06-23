@@ -12,17 +12,16 @@ import org.springframework.stereotype.Service;
 public class EmployeeServiceImpl implements EmployeeService {
 
   private final CrudRepository<Employee, Long> employeeRepository;
-  private EmptyResultDataAccessException notFoundException;
 
   @Autowired
   public EmployeeServiceImpl(CrudRepository<Employee, Long> employeeRepository) {
     this.employeeRepository = employeeRepository;
-    notFoundException = new EmptyResultDataAccessException("Employee not found", 1);
   }
 
   @Override
   public Employee getById(Long id) {
-    return employeeRepository.findById(id).orElseThrow(() -> notFoundException);
+    return employeeRepository.findById(id).orElseThrow(
+        () -> new EmptyResultDataAccessException("Cannot get employee: id " + id + "not found", 1));
   }
 
   @Override
@@ -34,8 +33,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public Employee save(Employee employee) {
-    employee.setEmployeeId(null);
-    return employeeRepository.save(employee);
+    if (employee.getEmployeeId() == null) {
+      return employeeRepository.save(employee);
+    } else {
+      throw new IllegalArgumentException("Employee id should be null.");
+    }
   }
 
   @Override
@@ -43,7 +45,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     if (employeeRepository.existsById(employee.getEmployeeId())) {
       return employeeRepository.save(employee);
     } else {
-      throw notFoundException;
+      throw new EmptyResultDataAccessException(
+          "Cannot update employee: id " + employee.getEmployeeId() + " not found", 1);
     }
   }
 
