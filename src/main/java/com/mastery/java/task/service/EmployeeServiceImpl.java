@@ -2,13 +2,10 @@ package com.mastery.java.task.service;
 
 import com.mastery.java.task.dao.EmployeeRepository;
 import com.mastery.java.task.dto.Employee;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 @Service
