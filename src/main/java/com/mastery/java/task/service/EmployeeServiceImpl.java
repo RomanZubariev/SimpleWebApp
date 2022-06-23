@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,7 +28,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public List<Employee> getAll() {
-    return employeeRepository.findAll();
+    return Streamable.of(employeeRepository.findAll()).toList();
   }
 
   @Override
