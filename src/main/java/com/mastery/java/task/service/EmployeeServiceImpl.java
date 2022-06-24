@@ -33,7 +33,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public Employee save(Employee employee) {
-    Optional.ofNullable(employee.getEmployeeId()).ifPresent((id) -> {
+    Optional.ofNullable(employee.getEmployeeId()).ifPresent(id -> {
       throw new IllegalArgumentException("Employee id should be null.");
     });
     return employeeRepository.save(employee);
