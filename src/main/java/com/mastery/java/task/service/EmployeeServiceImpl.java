@@ -21,7 +21,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public Employee getById(Long id) {
-
     return employeeRepository.findById(id).orElseThrow(
         () -> new EmptyResultDataAccessException("Cannot find employee with id = " + id, 1));
   }
@@ -43,7 +42,8 @@ public class EmployeeServiceImpl implements EmployeeService {
   public Employee update(Employee employee) {
     employeeRepository.findById(employee.getEmployeeId()).orElseThrow(
         () -> new EmptyResultDataAccessException(
-            "Cannot update employee: id " + employee.getEmployeeId() + " not found", 1));
+            "Cannot update employee info because such employee doesn't exist: id = "
+                + employee.getEmployeeId(), 1));
     return employeeRepository.save(employee);
   }
 
@@ -51,5 +51,4 @@ public class EmployeeServiceImpl implements EmployeeService {
   public void deleteById(Long id) {
     employeeRepository.deleteById(id);
   }
-
 }

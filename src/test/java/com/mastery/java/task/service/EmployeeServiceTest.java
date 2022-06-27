@@ -4,6 +4,7 @@ import com.mastery.java.task.dao.EmployeeRepository;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ class EmployeeServiceTest {
   @InjectMocks
   private EmployeeServiceImpl employeeServiceImpl;
   private Employee testEmployee;
+  private Employee testEmployee2;
 
   @BeforeEach
   void setup() {
@@ -40,6 +42,15 @@ class EmployeeServiceTest {
     testEmployee.setJobTitle("Job title");
     testEmployee.setGender(Gender.MALE);
     testEmployee.setDateOfBirth(LocalDate.now());
+
+    testEmployee2 = new Employee();
+    testEmployee2.setEmployeeId(2L);
+    testEmployee2.setFirstName("Test");
+    testEmployee2.setLastName("Surname");
+    testEmployee2.setDepartmentId(2);
+    testEmployee2.setJobTitle("Job title");
+    testEmployee2.setGender(Gender.FEMALE);
+    testEmployee2.setDateOfBirth(LocalDate.now());
   }
 
   @Test
@@ -95,5 +106,13 @@ class EmployeeServiceTest {
         Optional.of(testEmployee));
     when(employeeRepository.save(testEmployee)).thenReturn(testEmployee);
     Assertions.assertTrue(employeeServiceImpl.update(testEmployee).equals(testEmployee));
+  }
+
+  @Test
+  void getAllCheckElements() {
+    when(employeeRepository.findAll()).thenReturn(List.of(testEmployee, testEmployee2));
+    Assertions.assertTrue(employeeServiceImpl.getAll().contains(testEmployee));
+    Assertions.assertTrue(employeeServiceImpl.getAll().contains(testEmployee2));
+    Assertions.assertEquals(2, employeeServiceImpl.getAll().size());
   }
 }
