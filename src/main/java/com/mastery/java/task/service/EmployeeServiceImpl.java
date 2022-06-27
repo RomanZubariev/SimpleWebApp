@@ -20,13 +20,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public Employee getById(Long id) {
+
     return employeeRepository.findById(id).orElseThrow(
-        () -> new EmptyResultDataAccessException("Cannot get employee: id " + id + " not found",
-            1));
+        () -> new EmptyResultDataAccessException("Cannot find employee with id = " + id, 1));
   }
 
   @Override
   public List<Employee> getAll() {
+
     List<Employee> employeeList = new ArrayList<>();
     employeeRepository.findAll().forEach(employeeList::add);
     return employeeList;
@@ -34,6 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public Employee save(Employee employee) {
+
     if (employee.getEmployeeId() == null) {
       return employeeRepository.save(employee);
     } else {
@@ -43,11 +45,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public Employee update(Employee employee) {
+
     if (employeeRepository.existsById(employee.getEmployeeId())) {
       return employeeRepository.save(employee);
     } else {
       throw new EmptyResultDataAccessException(
-          "Cannot update employee: id " + employee.getEmployeeId() + " not found", 1);
+          "Cannot update employee info because such employee doesn't exist: id = "
+              + employee.getEmployeeId(), 1);
     }
   }
 
