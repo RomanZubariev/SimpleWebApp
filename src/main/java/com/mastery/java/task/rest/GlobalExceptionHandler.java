@@ -13,23 +13,23 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
   @ExceptionHandler(EmptyResultDataAccessException.class)
   public ResponseEntity<String> handleEmptyResultDataAccessException(
       EmptyResultDataAccessException exception) {
     if (Arrays.stream(exception.getStackTrace())
         .anyMatch(te -> te.getMethodName().matches("deleteById"))) {
-      logger.warn("Nothing was deleted.");
+      log.warn("DELETE method was used on non existing record.");
       return ResponseEntity.status(HttpStatus.OK).body("");
     }
-    logger.error(exception.getMessage());
+    log.error(exception.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
-    logger.error(exception.getMessage());
+    log.error(exception.getMessage());
     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(exception.getMessage());
   }
 }
