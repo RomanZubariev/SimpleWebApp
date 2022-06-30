@@ -32,7 +32,7 @@ public class EmployeeServiceImpl implements EmployeeService {
   @Override
   public Employee save(Employee employee) {
     if (employee.getEmployeeId() != null) {
-      throw new IllegalArgumentException("Employee id should be null.");
+      throw new IllegalArgumentException("Employee wasn't saved -  id should be null.");
     }
     return employeeRepository.save(employee);
   }
