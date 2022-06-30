@@ -53,7 +53,7 @@ class EmployeeServiceTest {
   }
 
   @Test
-  void getEmployeeTest() {
+  void shouldCallRepositoryOnceAndReturnTheSameEmployee() {
     Long id = 1L;
     when(employeeRepository.findById(id)).thenReturn(Optional.ofNullable(testEmployee));
     Assertions.assertEquals(testEmployee, employeeServiceImpl.getById(id));
@@ -61,7 +61,7 @@ class EmployeeServiceTest {
   }
 
   @Test
-  void getNullEmployeeTest() {
+  void shouldThrowEmptyResultDataAccessExceptionWithIdInTheMessage() {
     Long id = 1L;
     when(employeeRepository.findById(id)).thenReturn(Optional.empty());
     EmptyResultDataAccessException e = Assertions.assertThrows(EmptyResultDataAccessException.class,
@@ -70,27 +70,27 @@ class EmployeeServiceTest {
   }
 
   @Test
-  void saveEmployeeWithIdSetUp() {
+  void shouldThrowIllegalArgumentExceptionIfIdIsNotNull() {
     Assertions.assertThrows(IllegalArgumentException.class,
         () -> employeeServiceImpl.save(testEmployee));
   }
 
   @Test
-  void saveEmployeeWithoutId() {
+  void shouldReturnEmployeeIfIdIsNull() {
     testEmployee.setEmployeeId(null);
     when(employeeRepository.save(testEmployee)).thenReturn(testEmployee);
     Assertions.assertEquals(testEmployee, employeeServiceImpl.save(testEmployee));
   }
 
   @Test
-  void deleteCheckCallsNumber() {
+  void shouldCallRepositoryDeleteByIdOnce() {
     Long id = 1L;
     employeeServiceImpl.deleteById(id);
     verify(employeeRepository, times(1)).deleteById(id);
   }
 
   @Test
-  void updateNonExistingEmployee() {
+  void shouldThrowEmptyResultDataAccessExceptionIfUpdatedRecordNotExistsWithIdInTheMessage() {
     when(employeeRepository.existsById(testEmployee.getEmployeeId())).thenReturn(false);
     EmptyResultDataAccessException e = Assertions.assertThrows(EmptyResultDataAccessException.class,
         () -> employeeServiceImpl.update(testEmployee));
@@ -99,14 +99,14 @@ class EmployeeServiceTest {
   }
 
   @Test
-  void updateExistingEmployee() {
+  void shouldReturnTheEmployeeIfTheUpdatedRecordExists() {
     when(employeeRepository.existsById(testEmployee.getEmployeeId())).thenReturn(true);
     when(employeeRepository.save(testEmployee)).thenReturn(testEmployee);
     Assertions.assertEquals(employeeServiceImpl.update(testEmployee), testEmployee);
   }
 
   @Test
-  void getAllCheckElements() {
+  void shouldReturnListWithTwoEmployees() {
     when(employeeRepository.findAll()).thenReturn(List.of(testEmployee, testEmployee2));
     Assertions.assertTrue(employeeServiceImpl.getAll().contains(testEmployee));
     Assertions.assertTrue(employeeServiceImpl.getAll().contains(testEmployee2));
