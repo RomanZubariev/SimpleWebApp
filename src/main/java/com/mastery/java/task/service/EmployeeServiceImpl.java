@@ -1,58 +1,54 @@
 package com.mastery.java.task.service;
 
-import com.mastery.java.task.dao.EmployeeDao;
-import com.mastery.java.task.dao.EmployeeDaoImpl;
+import com.mastery.java.task.dao.EmployeeRepository;
 import com.mastery.java.task.dto.Employee;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-  private final EmployeeDao employeeDao;
+  private final EmployeeRepository employeeRepository;
 
   @Autowired
-  public EmployeeServiceImpl(EmployeeDao employeeDao){
-    this.employeeDao = employeeDao;
+  public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+    this.employeeRepository = employeeRepository;
   }
+
   @Override
   public Employee getById(Long id) {
-    try {
-      return employeeDao.getById(id);
-    } catch (EmptyResultDataAccessException e) {
-      e.printStackTrace();
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
-    }
+    return employeeRepository.findById(id).orElseThrow(
+        () -> new EmptyResultDataAccessException("Cannot find employee with id = " + id, 1));
   }
 
   @Override
   public List<Employee> getAll() {
-    return employeeDao.getAll();
+    return Streamable.of(employeeRepository.findAll()).toList();
   }
 
-  //Adds a record with id generated automatically
   @Override
   public Employee save(Employee employee) {
-    return employeeDao.save(employee);
+    if (employee.getEmployeeId() != null) {
+      throw new IllegalArgumentException("Employee wasn't saved -  id should be null.");
+    }
+    return employeeRepository.save(employee);
   }
 
   @Override
   public Employee update(Employee employee) {
-    try {
-      return employeeDao.update(employee);
-    } catch (EmptyResultDataAccessException e) {
-      e.printStackTrace();
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
+    if (!employeeRepository.existsById(employee.getEmployeeId())) {
+      throw new EmptyResultDataAccessException(
+          "Cannot update employee info because such employee doesn't exist: id = "
+              + employee.getEmployeeId(), 1);
     }
+    return employeeRepository.save(employee);
   }
 
   @Override
   public void deleteById(Long id) {
-    employeeDao.deleteById(id);
+    employeeRepository.deleteById(id);
   }
-
 }
