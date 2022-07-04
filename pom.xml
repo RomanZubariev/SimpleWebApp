@@ -38,6 +38,11 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
       <groupId>org.springframework.boot</groupId>
     </dependency>
+    <dependency>
+      <artifactId>springdoc-openapi-ui</artifactId>
+      <groupId>org.springdoc</groupId>
+      <version>1.6.9</version>
+    </dependency>
   </dependencies>
   <description>Practical task</description>
   <groupId>com.mastery</groupId>
