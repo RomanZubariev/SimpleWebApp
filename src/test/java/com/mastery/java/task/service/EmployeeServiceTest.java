@@ -40,7 +40,7 @@ class EmployeeServiceTest {
     testEmployee.setDepartmentId(1);
     testEmployee.setJobTitle("Job title");
     testEmployee.setGender(Gender.MALE);
-    testEmployee.setDateOfBirth(LocalDate.now());
+    testEmployee.setDateOfBirth(LocalDate.now().minusYears(18));
 
     testEmployee2 = new Employee();
     testEmployee2.setEmployeeId(2L);
@@ -49,7 +49,7 @@ class EmployeeServiceTest {
     testEmployee2.setDepartmentId(2);
     testEmployee2.setJobTitle("Job title");
     testEmployee2.setGender(Gender.FEMALE);
-    testEmployee2.setDateOfBirth(LocalDate.now());
+    testEmployee2.setDateOfBirth(LocalDate.now().minusYears(18));
   }
 
   @Test
