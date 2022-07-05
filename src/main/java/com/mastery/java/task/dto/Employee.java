@@ -7,22 +7,26 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 @Entity
 public class Employee {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Min(1)
+  @Max(Long.MAX_VALUE)
   private Long employeeId;
-
   private String firstName;
   private String lastName;
+  @Min(1)
+  @Max(Integer.MAX_VALUE)
   private Integer departmentId;
   private String jobTitle;
-
   @Enumerated(EnumType.STRING)
   private Gender gender;
-
+  @EmployeeBirthDate
   private LocalDate dateOfBirth;
 
   public Employee(Long employeeId, String firstName, String lastName, Integer departmentId,
