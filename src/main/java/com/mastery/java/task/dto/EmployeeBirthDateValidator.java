@@ -1,6 +1,7 @@
 package com.mastery.java.task.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -8,7 +9,7 @@ public class EmployeeBirthDateValidator implements ConstraintValidator<EmployeeB
 
   @Override
   public boolean isValid(LocalDate date, ConstraintValidatorContext context) {
-    return date.isBefore(LocalDate.now().minusYears(18));
+    return !date.isAfter(LocalDate.now().minusYears(18));
   }
 
 }
