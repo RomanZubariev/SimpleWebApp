@@ -1,13 +1,18 @@
 package com.mastery.java.task.rest;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
+import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
@@ -31,5 +36,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException exception) {
     log.error(exception.getMessage());
     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(exception.getMessage());
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<String> handleConstraintViolationException(
+      ConstraintViolationException exception) {
+    log.error(exception.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+  }
+
+  @Override
+  public ResponseEntity<Object> handleMethodArgumentNotValid(
+      MethodArgumentNotValidException exception, HttpHeaders headers, HttpStatus status,
+      WebRequest request) {
+    String validationMessages = exception.getBindingResult().getFieldErrors().stream()
+        .map(fe -> fe.getField() + ": " + fe.getDefaultMessage()).collect(Collectors.joining("\n"));
+    log.error(validationMessages);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationMessages);
   }
 }
