@@ -1,4 +1,4 @@
-package com.mastery.java.task.rest;
+package com.mastery.java.task.jms;
 
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.service.EmployeeService;
