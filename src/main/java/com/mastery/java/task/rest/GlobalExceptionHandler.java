@@ -2,7 +2,6 @@ package com.mastery.java.task.rest;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import javax.jms.JMSException;
 import javax.validation.ConstraintViolationException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -11,7 +10,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
 import org.springframework.util.ErrorHandler;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -57,16 +55,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
         .map(fe -> fe.getField() + ": " + fe.getDefaultMessage()).collect(Collectors.joining("\n"));
     log.error(validationMessages);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationMessages);
-  }
-
-  @ExceptionHandler(ListenerExecutionFailedException.class)
-  public void handleListenerExecutionFailedException(ListenerExecutionFailedException exception) {
-    log.error("Invalid message sent: {}", exception.getCause().getMessage());
-  }
-
-  @ExceptionHandler
-  public void jmsExceptionHandler(JMSException e) {
-    log.error(e.getMessage());
   }
 
   @Override
