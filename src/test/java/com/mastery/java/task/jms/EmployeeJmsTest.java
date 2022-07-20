@@ -5,6 +5,7 @@ import com.mastery.java.task.dto.Gender;
 import com.mastery.java.task.service.EmployeeService;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -23,7 +24,8 @@ class EmployeeJmsTest {
   @InjectMocks
   private EmployeeJms employeeJms;
 
-  EmployeeJmsTest() {
+  @BeforeEach
+  void setup() {
     correctEmployee = new Employee();
     correctEmployee.setEmployeeId(null);
     correctEmployee.setFirstName("Test");
