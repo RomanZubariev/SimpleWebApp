@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:63342/")
 @RequestMapping("/employee")
 @Validated
 public class EmployeeController {
@@ -37,6 +39,7 @@ public class EmployeeController {
     log.info("GET request received, id = {}", id);
     return employeeService.getById(id);
   }
+
 
   @GetMapping
   public List<Employee> getAll() {
