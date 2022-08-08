@@ -2,32 +2,56 @@
 <html>
 <head>
   <title>EmployeeUI</title>
-  <link rel="stylesheet" href="./css/styles.css" />
-  <script type="text/javascript" src="./js/jquery-3.6.0.min.js"></script>
-  <script type="text/javascript" src="./js/employee.js"></script>
+  <link href="./css/styles.css" rel="stylesheet"/>
+  <script src="./js/jquery-3.6.0.min.js" type="text/javascript"></script>
+  <script src="./js/employee.js" type="text/javascript"></script>
 </head>
 
 <body>
+<input id="getTab" name="tabs" onclick="getTab()" type="radio"/>
+<label for="getTab">GET</label>
+<input id="postTab" name="tabs" onclick="postTab()" type="radio"/>
+<label for="postTab">POST</label>
+<input id="putTab" name="tabs" onclick="putTab()" type="radio"/>
+<label for="putTab">PUT</label>
+<input id="deleteTab" name="tabs" onclick="deleteTab()" type="radio"/>
+<label for="deleteTab">DELETE</label>
 
-  <div>
-    <ul>
-      <li><span>Employee ID</span><input type="text" id="id"/></li>
-      <li><span>Name</span><input type="text" id="firstName"/></li>
-      <li><span>Surname</span><input type="text" id="lastName"/></li>
-      <li><span>Department ID</span><input type="text" id="departmentId"/></li>
-      <li><span>Job title</span><input type="text" id="jobTitle"/></li>
-      <li><span>Gender</span><input type="text" id="gender"/></li>
-      <li><span>Date of birth</span><input type="text" id="dateOfBirth"/></li>
-    </ul>
-    <ul>
-      <li><button id="get-button" onclick="getEmployee()">GET</button></li>
-      <li><button id="post-button" onclick="postEmployee()">POST</button></li>
-      <li><button id="put-button" onclick="putEmployee()">PUT</button></li>
-      <li><button id="delete-button" onclick="deleteEmployee()">DELETE</button></li>
-    </ul>
-  </div>
-  <span id="output"></span>
-  <script type="text/javascript" src="./js/jquery-3.6.0.min.js"></script>
-  <script type="text/javascript" src="./js/employee.js"></script>
+<form>
+  <label for="id">Employee ID</label><br>
+  <input id="id" type="text"/><br>
+  <label for="firstName">First Name</label><br>
+  <input disabled="true" id="firstName" type="text"/><br>
+  <label for="lastName">Surname</label><br>
+  <input disabled="true" id="lastName" type="text"/><br>
+  <label for="departmentId">Department ID</label><br>
+  <input disabled="true" id="departmentId" type="text"/><br>
+  <label for="jobTitle">Job title</label><br>
+  <input disabled="true" id="jobTitle" type="text"/><br>
+  <label for="gender">Gender</label><br>
+  <select disabled="true" id="gender">
+    <option value="MALE">Male</option>
+    <option value="FEMALE">Female</option>
+    <option value="OTHER">Other</option>
+  </select><br>
+  <label for="dateOfBirth">Date of birth</label><br>
+  <input disabled="true" id="dateOfBirth" placeholder="dd-mm-yyyy" type="date"/>
+</form>
+
+<div class="tab getContent">
+  <button id="get-button" onclick="getEmployee()">GET</button>
+</div>
+<div class="tab postContent">
+  <button id="post-button" onclick="postEmployee()">POST</button>
+</div>
+<div class="tab putContent">
+  <button id="put-button" onclick="putEmployee()">PUT</button>
+</div>
+<div class="tab deleteContent">
+  <button id="delete-button" onclick="deleteEmployee()">DELETE</button>
+</div>
+<span id="output"></span>
+<script src="./js/jquery-3.6.0.min.js" type="text/javascript"></script>
+<script src="./js/employee.js" type="text/javascript"></script>
 </body>
 </html>
