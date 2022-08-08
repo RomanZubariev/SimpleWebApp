@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EmployeeUI</title>
+  <link rel="stylesheet" href="./css/styles.css" />
+  <script type="text/javascript" src="./js/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="./js/employee.js"></script>
+</head>
+
+<body>
+
+  <div>
+    <ul>
+      <li><span>Employee ID</span><input type="text" id="id"/></li>
+      <li><span>Name</span><input type="text" id="firstName"/></li>
+      <li><span>Surname</span><input type="text" id="lastName"/></li>
+      <li><span>Department ID</span><input type="text" id="departmentId"/></li>
+      <li><span>Job title</span><input type="text" id="jobTitle"/></li>
+      <li><span>Gender</span><input type="text" id="gender"/></li>
+      <li><span>Date of birth</span><input type="text" id="dateOfBirth"/></li>
+    </ul>
+    <ul>
+      <li><button id="get-button" onclick="getEmployee()">GET</button></li>
+      <li><button id="post-button" onclick="postEmployee()">POST</button></li>
+      <li><button id="put-button" onclick="putEmployee()">PUT</button></li>
+      <li><button id="delete-button" onclick="deleteEmployee()">DELETE</button></li>
+    </ul>
+  </div>
+  <span id="output"></span>
+  <script type="text/javascript" src="./js/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="./js/employee.js"></script>
+</body>
+</html>
