@@ -1,0 +1,8 @@
+input + label { display: inline-block } /* show labels in line */
+input ~ .tab { display: none }          /* hide contents */
+/* show contents only for selected tab */
+#getTab:checked ~ .tab.getContent,
+#postTab:checked ~ .tab.postContent,
+#putTab:checked ~ .tab.putContent,
+#deleteTab:checked ~ .tab.deleteContent { display: block; }
+#getTab:checked ~ input[name=firstName] {pointer-events: none;}

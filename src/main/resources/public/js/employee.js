@@ -14,6 +14,12 @@ function getEmployee (){
       $('#output').html("Success");
     },
     error: function(xhr) {
+      $('#firstName').val('');
+      $('#lastName').val('');
+      $('#departmentId').val('');
+      $('#jobTitle').val('');
+      $('#gender').val('');
+      $('#dateOfBirth').val('');
       $('#output').html(xhr.status+" " +xhr.responseText);
     }
   });
@@ -80,4 +86,45 @@ function deleteEmployee (){
         $('#output').html(xhr.status+" " +xhr.responseText);
       }
     });
+}
+function getTab(){
+  $('#output').html('');
+  document.getElementById('id').disabled = false;
+  document.getElementById('firstName').disabled = true;
+  document.getElementById('lastName').disabled = true;
+  document.getElementById('departmentId').disabled = true;
+  document.getElementById('jobTitle').disabled = true;
+  document.getElementById('gender').disabled = true;
+  document.getElementById('dateOfBirth').disabled = true;
+}
+function postTab(){
+  $('#output').html('');
+  document.getElementById('id').disabled = true;
+  $('#id').val('null');
+  document.getElementById('firstName').disabled = false;
+  document.getElementById('lastName').disabled = false;
+  document.getElementById('departmentId').disabled = false;
+  document.getElementById('jobTitle').disabled = false;
+  document.getElementById('gender').disabled = false;
+  document.getElementById('dateOfBirth').disabled = false;
+}
+function putTab(){
+  $('#output').html('');
+  document.getElementById('id').disabled = false;
+  document.getElementById('firstName').disabled = false;
+  document.getElementById('lastName').disabled = false;
+  document.getElementById('departmentId').disabled = false;
+  document.getElementById('jobTitle').disabled = false;
+  document.getElementById('gender').disabled = false;
+  document.getElementById('dateOfBirth').disabled = false;
+}
+function deleteTab(){
+  $('#output').html('');
+  document.getElementById('id').disabled = false;
+  document.getElementById('firstName').disabled = true;
+  document.getElementById('lastName').disabled = true;
+  document.getElementById('departmentId').disabled = true;
+  document.getElementById('jobTitle').disabled = true;
+  document.getElementById('gender').disabled = true;
+  document.getElementById('dateOfBirth').disabled = true;
 }
