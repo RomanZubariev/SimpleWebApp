@@ -1,6 +1,6 @@
 function getEmployee (){
   var employeeId = $('#id').val();
-  var address = 'http://localhost:8080/simplewebapp/employee/'+employeeId;
+  var address = '/simplewebapp/employee/'+employeeId;
   $.ajax({
     url: address,
     type: 'GET',
@@ -25,7 +25,7 @@ function getEmployee (){
   });
 }
 function postEmployee (){
-  var address = 'http://localhost:8080/simplewebapp/employee'
+  var address = '/simplewebapp/employee'
   var jsondata = JSON.stringify({
    "employeeId": null,
    "firstName":$('#firstName').val(),
@@ -50,7 +50,7 @@ function postEmployee (){
 }
 
 function putEmployee (){
-  var address = 'http://localhost:8080/simplewebapp/employee';
+  var address = '/simplewebapp/employee';
   var jsondata = JSON.stringify({
    "employeeId": $('#id').val(),
    "firstName":$('#firstName').val(),
@@ -75,7 +75,7 @@ function putEmployee (){
 }
 function deleteEmployee (){
   var employeeId = $('#id').val();
-  var address = 'http://localhost:8080/simplewebapp/employee/'+employeeId;
+  var address = '/simplewebapp/employee/'+employeeId;
     $.ajax({
       url: address,
       type: 'DELETE',
