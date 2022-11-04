@@ -1,0 +1,38 @@
+type Query {
+  employeeById(id: ID): Employee!
+  allEmployees: [Employee]!
+}
+
+type Mutation {
+  updateEmployee(employeeId: ID!,
+                 firstName: String!
+                 lastName: String!
+                 departmentId: Int!
+                 jobTitle: String!
+                 gender: Gender!
+                 dateOfBirth: String!): Employee!
+
+  createEmployee(firstName: String!
+                 lastName: String!
+                 departmentId: Int!
+                 jobTitle: String!
+                 gender: Gender!
+                 dateOfBirth: String!): Employee!
+  deleteEmployee (id: ID!): ID
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+type Employee {
+  employeeId: ID
+  firstName: String
+  lastName: String
+  departmentId: Int
+  jobTitle: String
+  gender: Gender
+  dateOfBirth: String
+}
